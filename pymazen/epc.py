@@ -111,7 +111,7 @@ def get_connection():
     return sqlite3.connect('battery_company.db')
 
 st.sidebar.title("⚡ تسجيل دخول المندوب")
-reps_list = ["مازن", "أحمد", "علي", "محمد", "عبدالله", "إبراهيم", "حسين"]
+reps_list = ["مازن", "المدير هارون", "نبيل الجابري", "محمد", "سامي مختار", "إبراهيم", "حسين الحميقاني"]
 current_rep = st.sidebar.selectbox("اختر اسم المندوب الحالي:", ["-- اختر المندوب --"] + reps_list)
 
 if current_rep == "-- اختر المندوب --":
