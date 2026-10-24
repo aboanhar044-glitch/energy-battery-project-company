@@ -45,7 +45,7 @@ st.markdown('<div class="main-title">🔋 نظام إدارة البطاريات
 customers_list = get_customers()
 
 if customers_list:
-    st.success(فهرس تم تحميل بيانات العملاء بنجاح (عدد العملاء: {len(customers_list)}))
+  st.success(f"تم تحميل بيانات العملاء بنجاح (عدد العملاء: {len(customers_list)})")
     
     # استخراج أسماء العملاء لعرضها في القائمة المنسدلة للفواتير
     customer_names = [c['name'] for c in customers_list]
