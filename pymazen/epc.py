@@ -36,26 +36,34 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# إعدادات الاتصال بقاعدة بيانات Supabase السحابية
-# ضع هنا رابط مشروعك ومفتاح الـ Publishable key الذي نسخته للتو
-SUPABASE_URL = st.secrets.get("SUPABASE_URL", "رابط_مشروعك_هنا")
-SUPABASE_KEY = st.secrets.get("SUPABASE_KEY", "sb_publishable_mYn@TY-Vv03bnUE0DFoK_MdTAp_...")
+# ضع رابط مشروعك الصحيح هنا (يجب أن يبدأ بـ https:// وينتهي بـ .supabase.co وبدون مسافات)
+SUPABASE_URL = "https://whqqmwpjwjgweuvssskd.supabase.co"
+SUPABASE_KEY = "sb_publishable_mYn@TY-Vv03bnUE0DFoK_MdTAp_..."
 
 @st.cache_resource
 def init_supabase() -> Client:
+    if not SUPABASE_URL.startswith("https://"):
+        st.error("❌ خطأ: رابط Supabase يجب أن يبدأ بـ https://")
+        st.stop()
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 supabase = init_supabase()
 
 # دالة جلب العملاء من السحابة
 def get_customers():
-    response = supabase.table("customers").select("*").order("serial_no").execute()
-    return pd.DataFrame(response.data) if response.data else pd.DataFrame(columns=["serial_no", "name", "phone", "balance"])
+    try:
+        response = supabase.table("customers").select("*").order("serial_no").execute()
+        return pd.DataFrame(response.data) if response.data else pd.DataFrame(columns=["serial_no", "name", "phone", "balance"])
+    except Exception as e:
+        return pd.DataFrame(columns=["serial_no", "name", "phone", "balance"])
 
 # دالة جلب الحركات من السحابة
 def get_transactions():
-    response = supabase.table("transactions").select("*").order("id", desc=True).execute()
-    return pd.DataFrame(response.data) if response.data else pd.DataFrame(columns=["trans_date", "rep_name", "customer_serial", "customer_name", "trans_type", "amount", "details"])
+    try:
+        response = supabase.table("transactions").select("*").order("id", desc=True).execute()
+        return pd.DataFrame(response.data) if response.data else pd.DataFrame(columns=["trans_date", "rep_name", "customer_serial", "customer_name", "trans_type", "amount", "details"])
+    except Exception as e:
+        return pd.DataFrame(columns=["trans_date", "rep_name", "customer_serial", "customer_name", "trans_type", "amount", "details"])
 
 # الشريط الجانبي لتسجيل دخول المندوب
 st.sidebar.title("⚡ تسجيل دخول المندوب")
@@ -82,7 +90,7 @@ if menu == "📝 إصدار فاتورة / سند جديد":
     customers_df = get_customers()
     
     if customers_df.empty:
-        st.warning("⚠️ لا توجد بيانات عملاء حالياً. يرجى إضافة عملاء أو التحقق من قاعدة البيانات.")
+        st.warning("⚠️ لا توجد بيانات عملاء حالياً في جدول `customers` بقاعدة البيانات.")
     else:
         cust_options = [f"{row['serial_no']} - {row['name']}" for _, row in customers_df.iterrows()]
         selected_cust = st.selectbox("البحث عن العميل (بالاسم أو الرقم التسلسلي):", ["-- اختر العميل --"] + cust_options)
@@ -229,7 +237,6 @@ elif menu == "📊 لوحة تحكم المدير ومتابعة المبيعا�
         trans_df = get_transactions()
         
         if not trans_df.empty:
-            # تصفية حسب التاريخ والمندوب
             trans_df['trans_date_parsed'] = pd.to_datetime(trans_df['trans_date']).dt.date
             filtered_report = trans_df[
                 (trans_df['trans_date_parsed'] >= start_date) & 
