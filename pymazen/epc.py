@@ -36,7 +36,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ضع رابط مشروعك الصحيح هنا (يجب أن يبدأ بـ https:// وينتهي بـ .supabase.co وبدون مسافات)
+# إعدادات الاتصال السحابي الرسمي بـ Supabase
 SUPABASE_URL = "https://whqqmwpjwjgweuvssskd.supabase.co"
 SUPABASE_KEY = "sb_publishable_mYn@TY-Vv03bnUE0DFoK_MdTAp_..."
 
@@ -194,7 +194,7 @@ elif menu == "➕ إضافة عميل جديد":
     st.header("➕ إضافة عميل جديد وحفظه سحابياً ليظهر لدى الجميع فوراً")
     
     customers_df = get_customers()
-    max_serial = int(customers_df['serial_no'].max()) if not customers_df.empty else 1823
+    max_serial = int(customers_df['serial_no'].max()) if not customers_df.empty and 'serial_no' in customers_df.columns else 1823
     next_serial = max_serial + 1
     
     st.info(f"💡 الرقم التسلسلي التلقائي الممنوح للعميل الجديد: **{next_serial}**")
