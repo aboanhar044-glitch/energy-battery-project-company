@@ -38,7 +38,7 @@ st.markdown("""
 
 # إعدادات الاتصال السحابي الرسمي بـ Supabase
 SUPABASE_URL = "https://whqqmwpjwjgweuvssskd.supabase.co"
-SUPABASE_KEY = "sb_publishable_mYn@TY-Vv03bnUE0DFoK_MdTAp_..."
+SUPABASE_KEY = "sb_publishable_mYn0TY-Vv0O3bnUE0DFoKA_MdTApPnV"
 
 @st.cache_resource
 def init_supabase() -> Client:
