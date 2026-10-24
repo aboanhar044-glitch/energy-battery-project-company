@@ -3,7 +3,6 @@ import pandas as pd
 import sqlite3
 from datetime import datetime, date
 import urllib.parse
-import os
 
 st.set_page_config(
     page_title="نظام إدارة شركة مشاريع الطاقة للبطاريات",
@@ -11,7 +10,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# تصميم عصري وألوان فاخرة ومتناسقة
+# تصميم عصري وألوان احترافية متناسقة
 st.markdown("""
     <style>
     .main {
@@ -43,6 +42,7 @@ def init_db():
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     
+    # إنشاء الجداول إن لم تكن موجودة
     c.execute('''
         CREATE TABLE IF NOT EXISTS customers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,6 +66,7 @@ def init_db():
         )
     ''')
     
+    # إدخال بيانات العملاء الأساسية إذا كان الجدول فارغاً
     c.execute("SELECT COUNT(*) FROM customers")
     if c.fetchone()[0] == 0:
         initial_data = [
@@ -542,7 +543,7 @@ init_db()
 def get_connection():
     return sqlite3.connect(DB_FILE)
 
-# قائمة المندوبين الرسمية المطلوبة تماماً بناءً على الصورة الأخيرة
+# الشريط الجانبي لتسجيل دخول المندوب
 st.sidebar.title("⚡ تسجيل دخول المندوب")
 reps_list = ["المدير هارون", "حسين الحميقاني", "م / مازن القحفة", "سامي مختار", "نبيل الجابري", "إبراهيم", "محمد مختار"]
 current_rep = st.sidebar.selectbox("اختر اسم المندوب الحالي:", ["-- اختر المندوب --"] + reps_list)
@@ -585,8 +586,7 @@ if menu == "📝 إصدار فاتورة / سند جديد":
             trans_date = st.date_input("تاريخ الحركة:", value=date.today())
             details = st.text_input("تفاصيل / ملاحظات الفاتورة:")
             
-        # زر الحفظ والتحديث المرتبط بالإرسال الإجباري للواتساب فوراً
-        if st.button("💾 حفظ وتحديث ورصيد العميل + إشعار الواتساب الإجباري"):
+        if st.button("💾 حفظ وتحديث رصيد العميل + إشعار الواتساب الإجباري"):
             conn = get_connection()
             c = conn.cursor()
             
@@ -610,7 +610,6 @@ if menu == "📝 إصدار فاتورة / سند جديد":
             
             st.success(f"✅ تم الحفظ وتحديث رصيد العميل بنجاح! الرصيد الجديد: {new_balance:,} ASR")
             
-            # نص الرسالة الإجبارية الفورية للعميل
             msg = f"عزيزي العميل ({cust_info['name']})،\n" \
                   f"تم تسجيل ({trans_type}) بقيمة: {int(amount):,} ASR\n" \
                   f"التاريخ: {trans_date}\n" \
