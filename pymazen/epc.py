@@ -50,21 +50,18 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # دالة جلب العملاء من السحابة
+# دالة جلب العملاء من السحابة مع إظهار الخطأ إن وجد
 def get_customers():
     try:
         response = supabase.table("customers").select("*").order("serial_no").execute()
-        return pd.DataFrame(response.data) if response.data else pd.DataFrame(columns=["serial_no", "name", "phone", "balance"])
+        if response.data:
+            return pd.DataFrame(response.data)
+        else:
+            st.warning("⚠️ الاستجابة من السحابة فارغة (لا توجد بيانات راجعة).")
+            return pd.DataFrame(columns=["serial_no", "name", "phone", "balance"])
     except Exception as e:
+        st.error(f"❌ خطأ تفصيلي من سابابيس: {e}")
         return pd.DataFrame(columns=["serial_no", "name", "phone", "balance"])
-
-# دالة جلب الحركات من السحابة
-def get_transactions():
-    try:
-        response = supabase.table("transactions").select("*").order("id", desc=True).execute()
-        return pd.DataFrame(response.data) if response.data else pd.DataFrame(columns=["trans_date", "rep_name", "customer_serial", "customer_name", "trans_type", "amount", "details"])
-    except Exception as e:
-        return pd.DataFrame(columns=["trans_date", "rep_name", "customer_serial", "customer_name", "trans_type", "amount", "details"])
-
 # الشريط الجانبي لتسجيل دخول المندوب
 st.sidebar.title("⚡ تسجيل دخول المندوب")
 reps_list = ["المدير هارون", "حسين الحميقاني", "م / مازن القحفة", "سامي مختار", "نبيل الجابري", "إبراهيم", "محمد مختار"]
